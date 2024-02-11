@@ -13,7 +13,9 @@
     "files": [
         "dist/system/src/index.d.ts",
         "dist/system/index.js",
-        "dist/system/index.js.map"
+        "dist/system/index.js.map",
+        "dist/system/monaco-editor/esm/vs/editor/editor.worker.js",
+        "dist/system/monaco-editor/esm/vs/editor/editor.worker.js.map"
     ],
     "keywords": [
         "my",
