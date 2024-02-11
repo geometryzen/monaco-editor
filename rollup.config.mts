@@ -4,7 +4,9 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import { RollupOptions } from 'rollup';
 import dts from 'rollup-plugin-dts';
+import monaco from 'rollup-plugin-monaco-editor';
 import pkg from './package.json' assert { type: 'json' };
+import postcss from 'rollup-plugin-postcss';
 
 /**
 * Comment with library information to be appended in the generated bundles.
@@ -20,47 +22,55 @@ const options: RollupOptions[] = [
     {
         input: './src/index.ts',
         output: [
+            /*
             {
                 banner,
-                file: './dist/esm/index.js',
+                dir: './dist/esm',
                 format: 'esm',
                 sourcemap: true
             },
             {
-                file: './dist/esm/index.min.js',
+                dir: './dist/esm',
                 format: 'esm',
                 sourcemap: true,
                 plugins: [terser()]
             },
+            */
             {
                 banner,
-                file: './dist/system/index.js',
+                dir: './dist/system',
                 format: 'system',
                 sourcemap: true
             },
             {
-                file: './dist/system/index.min.js',
+                dir: './dist/system',
                 format: 'system',
                 sourcemap: true,
                 plugins: [terser()]
             },
+            /*
             {
                 banner,
-                file: './dist/commonjs/index.js',
+                dir: './dist/commonjs',
                 format: 'commonjs',
                 sourcemap: true
             },
+            */
         ],
         plugins: [
             // Allows us to consume libraries that are CommonJS.
             commonjs(),
+            postcss(),
+            monaco({
+                languages: ['javascript']
+            }),
             resolve(),
             typescript({ tsconfig: './tsconfig.json' })
         ]
     },
     // Bundle the generated ESM type definitions.
     {
-        input: './dist/esm/types/src/index.d.ts',
+        input: './dist/system/src/index.d.ts',
         output: [{ file: './dist/index.d.ts', format: "esm" }],
         plugins: [dts()]
     }

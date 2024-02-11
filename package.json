@@ -1,25 +1,19 @@
 {
-    "name": "@geometryzen/my-lib",
+    "name": "@geometryzen/monaco-editor",
     "version": "0.9.7",
-    "description": "My Library",
+    "description": "monaco-editor for use in STEMCstudio",
     "exports": {
         ".": {
-            "types": "./dist/index.d.ts",
-            "system": "./dist/system/index.min.js",
-            "default": "./dist/commonjs/index.js"
+            "types": "./dist/system/src/index.d.ts",
+            "system": "./dist/system/index.js",
+            "default": "./dist/system/index.js"
         }
     },
-    "main": "./dist/commonjs/index.js",
-    "module": "./dist/esm/index.min.js",
-    "types": "./dist/index.d.ts",
+    "types": "./dist/system/src/index.d.ts",
     "files": [
-        "dist/commonjs/index.js",
-        "dist/commonjs/index.js.map",
-        "dist/esm/index.min.js",
-        "dist/esm/index.min.js.map",
-        "dist/index.d.ts",
-        "dist/system/index.min.js",
-        "dist/system/index.min.js.map"
+        "dist/system/src/index.d.ts",
+        "dist/system/index.js",
+        "dist/system/index.js.map"
     ],
     "keywords": [
         "my",
@@ -39,13 +33,13 @@
         "lint": "eslint . --ext .ts",
         "pages": "npm run docs:typedoc && gh-pages -d docs",
         "pretest": "npm run build",
-        "prepublishOnly": "npm run check && npm run build && npm run test && npm run lint && npm run pages",
+        "prepublishOnly": "npm run check && npm run build && npm run lint && npm run pages",
         "release": "release-it",
         "test": "jest"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/geometryzen/my-lib.git"
+        "url": "git+https://github.com/geometryzen/monaco-editor.git"
     },
     "author": {
         "name": "David Geo Holmes",
@@ -53,9 +47,9 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/geometryzen/my-lib/issues"
+        "url": "https://github.com/geometryzen/monaco-editor/issues"
     },
-    "homepage": "https://github.com/geometryzen/my-lib#readme",
+    "homepage": "https://github.com/geometryzen/monaco-editor#readme",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^25.0.7",
         "@rollup/plugin-node-resolve": "^15.2.3",
@@ -73,11 +67,16 @@
         "release-it": "^17.0.3",
         "rollup": "^4.10.0",
         "rollup-plugin-dts": "^6.1.0",
+        "rollup-plugin-monaco-editor": "^0.2.1",
         "rollup-plugin-peer-deps-external": "^2.2.4",
+        "rollup-plugin-postcss": "^4.0.2",
         "ts-jest": "^29.1.2",
         "ts-jest-resolver": "^2.0.1",
         "ts-node": "^10.9.2",
         "typedoc": "^0.25.8",
         "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "monaco-editor": "^0.46.0"
     }
 }
