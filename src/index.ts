@@ -1,9 +1,10 @@
-import { editor as monaco } from 'monaco-editor';
+import loader, { Monaco } from '@monaco-editor/loader';
+import { editor as monacoEditor } from 'monaco-editor';
 
 export class Editor {
-    readonly #inner: monaco.IStandaloneCodeEditor;
+    readonly #inner: monacoEditor.IStandaloneCodeEditor;
     #refCount = 1;
-    constructor(inner: monaco.IStandaloneCodeEditor) {
+    constructor(inner: monacoEditor.IStandaloneCodeEditor) {
         this.#inner = inner;
     }
     get value(): string {
@@ -29,14 +30,20 @@ export interface EditorConfig {
     value?: string;
 }
 
-function monaco_config(config: EditorConfig): monaco.IStandaloneEditorConstructionOptions {
+function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
         language: 'javascript'
     };
 }
 
-export function create_editor(config: EditorConfig): Editor {
-    const inner: monaco.IStandaloneCodeEditor = monaco.create(config.parent, monaco_config(config));
+export async function create_editor(config: EditorConfig): Promise<Editor> {
+    const loadMonaco = loader.init();
+
+    // const abort = ()=>loadMonaco.cancel();
+
+    const monaco: Monaco = await loadMonaco;
+
+    const inner: monacoEditor.IStandaloneCodeEditor = monaco.editor.create(config.parent, monaco_config(config));
     return new Editor(inner);
 }

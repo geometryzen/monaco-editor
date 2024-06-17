@@ -4,7 +4,6 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import { RollupOptions } from 'rollup';
 import dts from 'rollup-plugin-dts';
-import monaco from 'rollup-plugin-monaco-editor';
 import pkg from './package.json' assert { type: 'json' };
 import postcss from 'rollup-plugin-postcss';
 
@@ -61,9 +60,6 @@ const options: RollupOptions[] = [
             // Allows us to consume libraries that are CommonJS.
             commonjs(),
             postcss(),
-            monaco({
-                languages: ['javascript']
-            }),
             resolve(),
             typescript({ tsconfig: './tsconfig.json' })
         ]
