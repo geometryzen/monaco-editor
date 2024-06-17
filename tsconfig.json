@@ -1,13 +1,13 @@
 {
     "compilerOptions": {
-        "target": "es2022",
+        "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node",
         "declaration": true,
-        "declarationDir": "./dist/system",
+        "declarationDir": "types",
         "emitDeclarationOnly": true,
         "sourceMap": true,
-        "outDir": "./dist/system",
+        "outDir": "build",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
@@ -21,8 +21,6 @@
         "removeComments": false,
         "resolveJsonModule": true
     },
-    "include": [
-        "./src/**/*.ts",
-        "rollup.config.mts"
-    ]
+    "include": ["./src/**/*.ts", "./rollup.config.mts", "./rollup-plugin-dts.d.ts"],
+    "exclude": ["node_modules"]
 }

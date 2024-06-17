@@ -4,8 +4,12 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import { RollupOptions } from 'rollup';
 import dts from 'rollup-plugin-dts';
+import peer_deps_external from 'rollup-plugin-peer-deps-external';
 import pkg from './package.json' assert { type: 'json' };
-import postcss from 'rollup-plugin-postcss';
+
+function non_minified_file(path: string): string {
+    return path.replace(".min.js", ".js");
+}
 
 /**
 * Comment with library information to be appended in the generated bundles.
@@ -21,53 +25,55 @@ const options: RollupOptions[] = [
     {
         input: './src/index.ts',
         output: [
-            /*
             {
                 banner,
-                dir: './dist/esm',
+                file: non_minified_file(pkg.exports['.'].import),
                 format: 'esm',
                 sourcemap: true
             },
             {
-                dir: './dist/esm',
+                file: pkg.exports['.'].import,
                 format: 'esm',
                 sourcemap: true,
                 plugins: [terser()]
             },
-            */
             {
                 banner,
-                dir: './dist/system',
+                file: non_minified_file(pkg.exports['.'].system),
                 format: 'system',
                 sourcemap: true
             },
             {
-                dir: './dist/system',
+                file: pkg.exports['.'].system,
                 format: 'system',
                 sourcemap: true,
                 plugins: [terser()]
             },
-            /*
             {
                 banner,
-                dir: './dist/commonjs',
+                file: pkg.exports['.'].require,
                 format: 'commonjs',
                 sourcemap: true
             },
-            */
+            {
+                file: pkg.browser,
+                format: 'umd',
+                name: 'MONACO',
+                sourcemap: true
+            }
         ],
         plugins: [
             // Allows us to consume libraries that are CommonJS.
             commonjs(),
-            postcss(),
+            peer_deps_external() as Plugin,
             resolve(),
-            typescript({ tsconfig: './tsconfig.json' })
+            typescript({ tsconfig: './tsconfig.json', exclude: ['**/*.spec.ts'], noEmitOnError: true })
         ]
     },
     // Bundle the generated ESM type definitions.
     {
-        input: './dist/system/src/index.d.ts',
-        output: [{ file: './dist/index.d.ts', format: "esm" }],
+        input: './dist/esm/types/src/index.d.ts',
+        output: [{ file: pkg.types, format: "esm" }],
         plugins: [dts()]
     }
 ];

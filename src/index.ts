@@ -1,5 +1,5 @@
-import loader, { Monaco } from '@monaco-editor/loader';
-import { editor as monacoEditor } from 'monaco-editor';
+import loader, { Monaco } from "@monaco-editor/loader";
+import { editor as monacoEditor } from "monaco-editor";
 
 export class Editor {
     readonly #inner: monacoEditor.IStandaloneCodeEditor;
@@ -25,7 +25,7 @@ export class Editor {
 }
 
 export interface EditorConfig {
-    extensions?: unknown[],
+    extensions?: unknown[];
     parent: HTMLElement;
     value?: string;
 }
@@ -33,7 +33,7 @@ export interface EditorConfig {
 function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
-        language: 'javascript'
+        language: "javascript"
     };
 }
 
