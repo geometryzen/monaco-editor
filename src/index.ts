@@ -1,6 +1,10 @@
 import loader, { Monaco } from "@monaco-editor/loader";
 import { editor as monacoEditor } from "monaco-editor";
 
+export interface Disposable {
+    dispose(): void;
+}
+
 export class Editor {
     readonly #inner: monacoEditor.IStandaloneCodeEditor;
     #refCount = 1;
@@ -12,6 +16,9 @@ export class Editor {
     }
     set value(value: string) {
         this.#inner.setValue(value);
+    }
+    onDidChangeModelContent(callback: () => void): Disposable {
+        return this.#inner.onDidChangeModelContent(callback);
     }
     addRef(): void {
         this.#refCount++;
@@ -25,7 +32,7 @@ export class Editor {
 }
 
 export interface EditorConfig {
-    extensions?: unknown[];
+    language: string | null;
     parent: HTMLElement;
     value?: string;
 }
@@ -33,7 +40,7 @@ export interface EditorConfig {
 function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
-        language: "javascript"
+        language: config.language
     };
 }
 
