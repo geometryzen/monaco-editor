@@ -1,6 +1,6 @@
 {
     "name": "@geometryzen/monaco-editor",
-    "version": "0.9.19",
+    "version": "0.9.20",
     "description": "monaco-editor for use in STEMCstudio",
     "exports": {
         ".": {
