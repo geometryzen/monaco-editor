@@ -30,21 +30,16 @@ const state: {
 };
 
 export function init(): Promise<Monaco> {
-    /*
-    if (getWindowMonaco()) {
-        return Promise.resolve(getWindowMonaco());
-    }
-    */
-
     if (state.monaco) {
         return state.monaco;
     } else {
-        return (state.monaco = new Promise<Monaco>((resolve, reject) => {
+        state.monaco = new Promise<Monaco>((resolve, reject) => {
             state.resolve = resolve;
             state.reject = reject;
             const script = createMonacoLoaderScriptElement();
             injectScriptElement(script);
-        }));
+        });
+        return state.monaco;
     }
 }
 
@@ -75,22 +70,8 @@ function configureLoader() {
 
     require.config(state.config);
     require(["vs/editor/editor.main"], function (monaco: Monaco) {
-        // setWindowMonaco(monaco);
         state.resolve(monaco);
     }, function (error: unknown) {
         state.reject(error);
     });
 }
-/*
-
-interface HasMonacoProperty {
-    monaco: Monaco | undefined;
-}
-function setWindowMonaco(monaco: Monaco): void {
-    (window as unknown as HasMonacoProperty).monaco = monaco;
-}
-
-function getWindowMonaco(): Monaco | undefined {
-    return (window as unknown as HasMonacoProperty).monaco;
-}
-*/
