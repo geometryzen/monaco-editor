@@ -65,7 +65,7 @@ function createMonacoLoaderScriptElement(): HTMLScriptElement {
 
 interface MonacoEditorLoader {
     config(configData: unknown): void;
-    (modules: string[], resolve: Function, reject: Function): void;
+    (modules: string[], resolve: (module: Monaco) => void, reject: (e: unknown) => void): void;
 }
 
 function configureLoader() {
