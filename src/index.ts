@@ -1,5 +1,5 @@
-import loader, { Monaco } from "@monaco-editor/loader";
 import { editor as monacoEditor } from "monaco-editor";
+import { init, Monaco } from "./loader";
 
 let monaco: Monaco | undefined;
 const themes: Map<string, ThemeData> = new Map();
@@ -101,7 +101,7 @@ function monaco_config(config: CodeEditorOptions): monacoEditor.IStandaloneEdito
 
 export async function createCodeEditor(domElement: HTMLElement, options: CodeEditorOptions): Promise<CodeEditor> {
     if (typeof monaco === "undefined") {
-        monaco = await loader.init();
+        monaco = await init();
     }
 
     themes.forEach((themeData, themeName) => {
