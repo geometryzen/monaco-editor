@@ -5,7 +5,14 @@ export interface Disposable {
     dispose(): void;
 }
 
-export class Editor implements Disposable {
+export interface IStandaloneCodeEditor extends Disposable {
+    focus(): void;
+    getValue(): string;
+    setValue(value: string): void;
+    onDidChangeModelContent(callback: () => void): Disposable;
+}
+
+class Editor implements IStandaloneCodeEditor {
     readonly #inner: monacoEditor.IStandaloneCodeEditor;
     #refCount = 1;
     constructor(inner: monacoEditor.IStandaloneCodeEditor) {
@@ -43,7 +50,7 @@ export class Editor implements Disposable {
     }
 }
 
-export interface EditorConfig {
+export interface IStandaloneEditorConstructionOptions {
     language: string | null;
     lineNumbers?: "on" | "off" | "relative" | "interval" | ((lineNumber: number) => string);
     scrollBeyondLastColumn?: number;
@@ -51,7 +58,7 @@ export interface EditorConfig {
     value?: string;
 }
 
-function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorConstructionOptions {
+function monaco_config(config: IStandaloneEditorConstructionOptions): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
         language: config.language,
@@ -64,7 +71,7 @@ function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorCons
     };
 }
 
-export async function createEditor(domElement: HTMLElement, config: EditorConfig): Promise<Editor> {
+export async function createEditor(domElement: HTMLElement, options: IStandaloneEditorConstructionOptions): Promise<IStandaloneCodeEditor> {
     const monaco: Monaco = await loader.init();
-    return new Editor(monaco.editor.create(domElement, monaco_config(config)));
+    return new Editor(monaco.editor.create(domElement, monaco_config(options)));
 }
