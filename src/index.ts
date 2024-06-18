@@ -1,18 +1,36 @@
 import loader, { Monaco } from "@monaco-editor/loader";
 import { editor as monacoEditor } from "monaco-editor";
 
+const monaco: Monaco = await loader.init();
+
 export interface Disposable {
     dispose(): void;
 }
 
-export interface IStandaloneCodeEditor extends Disposable {
+export interface CodeEditor extends Disposable {
     focus(): void;
     getValue(): string;
     setValue(value: string): void;
     onDidChangeModelContent(callback: () => void): Disposable;
 }
 
-class Editor implements IStandaloneCodeEditor {
+export interface ThemeData {
+    base: "vs" | "vs-dark" | "hc-black" | "hc-light";
+    inherit: boolean;
+    rules: { token: string; foreground?: string; background?: string; fontStyle?: string }[];
+    encodedTokensColors?: string[];
+    colors: { [colorId: string]: string };
+}
+
+export function defineTheme(themeName: string, themeData: ThemeData): void {
+    monacoEditor.defineTheme(themeName, themeData);
+}
+
+export function setTheme(themeName: string): void {
+    monacoEditor.setTheme(themeName);
+}
+
+class Editor implements CodeEditor {
     readonly #inner: monacoEditor.IStandaloneCodeEditor;
     #refCount = 1;
     constructor(inner: monacoEditor.IStandaloneCodeEditor) {
@@ -50,7 +68,7 @@ class Editor implements IStandaloneCodeEditor {
     }
 }
 
-export interface IStandaloneEditorConstructionOptions {
+export interface CodeEditorOptions {
     language: string | null;
     lineNumbers?: "on" | "off" | "relative" | "interval" | ((lineNumber: number) => string);
     scrollBeyondLastColumn?: number;
@@ -58,7 +76,7 @@ export interface IStandaloneEditorConstructionOptions {
     value?: string;
 }
 
-function monaco_config(config: IStandaloneEditorConstructionOptions): monacoEditor.IStandaloneEditorConstructionOptions {
+function monaco_config(config: CodeEditorOptions): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
         language: config.language,
@@ -71,7 +89,6 @@ function monaco_config(config: IStandaloneEditorConstructionOptions): monacoEdit
     };
 }
 
-export async function createEditor(domElement: HTMLElement, options: IStandaloneEditorConstructionOptions): Promise<IStandaloneCodeEditor> {
-    const monaco: Monaco = await loader.init();
+export async function createCodeEditor(domElement: HTMLElement, options: CodeEditorOptions): Promise<CodeEditor> {
     return new Editor(monaco.editor.create(domElement, monaco_config(options)));
 }

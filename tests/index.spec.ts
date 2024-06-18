@@ -1,5 +1,5 @@
-import { createEditor } from "../src/index";
+import { createCodeEditor } from "../src/index";
 
-test("create_editor", function () {
-    expect(typeof createEditor === "function").toBe(true);
+test("createCodeEditor", function () {
+    expect(typeof createCodeEditor === "function").toBe(true);
 });
