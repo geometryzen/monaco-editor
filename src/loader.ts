@@ -17,64 +17,38 @@ const state: {
         };
     };
     monaco?: Promise<Monaco>;
-    resolve(monaco: Monaco | PromiseLike<Monaco>): void;
-    reject(e: unknown): void;
 } = {
     config: {
         paths: {
             vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs"
         }
-    },
-    resolve: () => {},
-    reject: () => {}
+    }
 };
 
 export function init(): Promise<Monaco> {
     if (state.monaco) {
-        console.log("Returning existing state.monaco");
         return state.monaco;
     } else {
-        console.log("Creating state.monaco");
         state.monaco = new Promise<Monaco>((resolve, reject) => {
-            console.log("Creating loader script element...");
-            state.resolve = resolve;
-            state.reject = reject;
-            const script = createMonacoLoaderScriptElement();
-            injectScriptElement(script);
+            const script = document.createElement("script");
+            script.src = `${state.config.paths.vs}/loader.js`;
+            script.onload = function () {
+                const require = window.require as unknown as MonacoEditorLoader;
+                require.config(state.config);
+                require(["vs/editor/editor.main"], function (monaco: Monaco) {
+                    resolve(monaco);
+                }, function (error: unknown) {
+                    reject(error);
+                });
+            };
+            script.onerror = reject;
+            document.body.appendChild(script);
         });
         return state.monaco;
     }
 }
 
-function injectScriptElement(script: HTMLScriptElement) {
-    return document.body.appendChild(script);
-}
-
-function createScriptElement(src: string): HTMLScriptElement {
-    const script = document.createElement("script");
-    script.src = src;
-    return script;
-}
-
-function createMonacoLoaderScriptElement(): HTMLScriptElement {
-    const script = createScriptElement(`${state.config.paths.vs}/loader.js`);
-    script.onload = () => configureLoader();
-    script.onerror = state.reject;
-    return script;
-}
-
 interface MonacoEditorLoader {
     config(configData: unknown): void;
     (modules: string[], resolve: (module: Monaco) => void, reject: (e: unknown) => void): void;
-}
-
-function configureLoader() {
-    const require = window.require as unknown as MonacoEditorLoader;
-
-    require.config(state.config);
-    require(["vs/editor/editor.main"], function (monaco: Monaco) {
-        state.resolve(monaco);
-    }, function (error: unknown) {
-        state.reject(error);
-    });
 }
