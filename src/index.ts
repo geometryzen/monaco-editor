@@ -5,7 +5,7 @@ export interface Disposable {
     dispose(): void;
 }
 
-export class Editor {
+export class Editor implements Disposable {
     readonly #inner: monacoEditor.IStandaloneCodeEditor;
     #refCount = 1;
     constructor(inner: monacoEditor.IStandaloneCodeEditor) {
@@ -17,8 +17,20 @@ export class Editor {
     set value(value: string) {
         this.#inner.setValue(value);
     }
+    focus(): void {
+        this.#inner.focus();
+    }
+    getValue(): string {
+        return this.#inner.getValue();
+    }
+    setValue(value: string): void {
+        this.#inner.setValue(value);
+    }
     onDidChangeModelContent(callback: () => void): Disposable {
         return this.#inner.onDidChangeModelContent(callback);
+    }
+    dispose(): void {
+        this.#inner.dispose();
     }
     addRef(): void {
         this.#refCount++;
@@ -33,24 +45,26 @@ export class Editor {
 
 export interface EditorConfig {
     language: string | null;
-    parent: HTMLElement;
+    lineNumbers?: "on" | "off" | "relative" | "interval" | ((lineNumber: number) => string);
+    scrollBeyondLastColumn?: number;
+    scrollBeyondLastLine?: boolean;
     value?: string;
 }
 
 function monaco_config(config: EditorConfig): monacoEditor.IStandaloneEditorConstructionOptions {
     return {
         value: config.value,
-        language: config.language
+        language: config.language,
+        lineNumbers: config.lineNumbers,
+        minimap: {
+            enabled: false
+        },
+        scrollBeyondLastColumn: config.scrollBeyondLastColumn,
+        scrollBeyondLastLine: config.scrollBeyondLastLine
     };
 }
 
-export async function create_editor(config: EditorConfig): Promise<Editor> {
-    const loadMonaco = loader.init();
-
-    // const abort = ()=>loadMonaco.cancel();
-
-    const monaco: Monaco = await loadMonaco;
-
-    const inner: monacoEditor.IStandaloneCodeEditor = monaco.editor.create(config.parent, monaco_config(config));
-    return new Editor(inner);
+export async function createEditor(domElement: HTMLElement, config: EditorConfig): Promise<Editor> {
+    const monaco: Monaco = await loader.init();
+    return new Editor(monaco.editor.create(domElement, monaco_config(config)));
 }
