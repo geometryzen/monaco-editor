@@ -31,9 +31,12 @@ const state: {
 
 export function init(): Promise<Monaco> {
     if (state.monaco) {
+        console.log("Returning existing state.monaco");
         return state.monaco;
     } else {
+        console.log("Creating state.monaco");
         state.monaco = new Promise<Monaco>((resolve, reject) => {
+            console.log("Creating loader script element...");
             state.resolve = resolve;
             state.reject = reject;
             const script = createMonacoLoaderScriptElement();
