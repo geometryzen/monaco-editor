@@ -1,7 +1,9 @@
 import loader, { Monaco } from "@monaco-editor/loader";
 import { editor as monacoEditor } from "monaco-editor";
 
-const monaco: Monaco = await loader.init();
+let monaco: Monaco | undefined;
+const themes: Map<string, ThemeData> = new Map();
+const themeNames: string[] = [];
 
 export interface Disposable {
     dispose(): void;
@@ -23,11 +25,19 @@ export interface ThemeData {
 }
 
 export function defineTheme(themeName: string, themeData: ThemeData): void {
-    monacoEditor.defineTheme(themeName, themeData);
+    if (typeof monaco === "undefined") {
+        themes.set(themeName, themeData);
+    } else {
+        monaco.editor.defineTheme(themeName, themeData);
+    }
 }
 
 export function setTheme(themeName: string): void {
-    monacoEditor.setTheme(themeName);
+    if (typeof monaco === "undefined") {
+        themeNames.push(themeName);
+    } else {
+        monaco.editor.setTheme(themeName);
+    }
 }
 
 class Editor implements CodeEditor {
@@ -90,5 +100,18 @@ function monaco_config(config: CodeEditorOptions): monacoEditor.IStandaloneEdito
 }
 
 export async function createCodeEditor(domElement: HTMLElement, options: CodeEditorOptions): Promise<CodeEditor> {
+    if (typeof monaco === "undefined") {
+        monaco = await loader.init();
+    }
+
+    themes.forEach((themeData, themeName) => {
+        monaco.editor.defineTheme(themeName, themeData);
+    });
+    themes.clear();
+    for (const themeName of themeNames) {
+        monaco.editor.setTheme(themeName);
+    }
+    themeNames.length = 0;
+
     return new Editor(monaco.editor.create(domElement, monaco_config(options)));
 }
